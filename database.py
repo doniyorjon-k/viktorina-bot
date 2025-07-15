@@ -241,10 +241,30 @@ class Database:
                         'referral_count': row[3]
                     })
                 
+                logger.info(f"Found {len(participants)} eligible participants")
                 return participants
             except Exception as e:
                 logger.error(f"Error getting participants: {e}")
                 return []
+    
+    def update_user_info(self, user_id: int, username: str, first_name: str) -> bool:
+        """Update user's username and first_name"""
+        with self.lock:
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    UPDATE users SET username = ?, first_name = ?
+                    WHERE user_id = ?
+                ''', (username, first_name, user_id))
+                
+                conn.commit()
+                conn.close()
+                return True
+            except Exception as e:
+                logger.error(f"Error updating user info: {e}")
+                return False
     
     def add_admin(self, admin_id: int, username: str) -> bool:
         """Add admin to database"""

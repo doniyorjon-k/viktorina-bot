@@ -32,11 +32,18 @@ class UserHandlers:
             referral_code = context.args[0]
             logger.info(f"User {user_id} started with referral code: {referral_code}")
         
-        # Generate unique referral code for this user
-        user_referral_code = self.referral_utils.generate_referral_code(user_id)
+        # Check if user already exists
+        existing_user = self.db.get_user(user_id)
         
-        # Add user to database
-        self.db.add_user(user_id, username, first_name, user_referral_code)
+        if not existing_user:
+            # Generate unique referral code for new user
+            user_referral_code = self.referral_utils.generate_referral_code(user_id)
+            # Add new user to database
+            self.db.add_user(user_id, username, first_name, user_referral_code)
+        else:
+            # Update existing user's username and first_name if changed
+            if existing_user['username'] != username or existing_user['first_name'] != first_name:
+                self.db.update_user_info(user_id, username, first_name)
         
         # Process referral if provided
         if referral_code:
