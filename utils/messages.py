@@ -55,10 +55,12 @@ Viktorinaga qatnashish uchun kamida {self.min_referrals} ta do'stingizni taklif 
 
 Bu havolani do'stlaringiz bilan ulashing. Ular bu havola orqali botga kirishganda, sizga ball qo'shiladi.
 
+⚠️ **Muhim:** Do'stlaringiz avval @testforviktorina guruhiga qo'shilishi kerak!
+
 💡 **Qanday ishlaydi:**
-1. Havolani nusxalang
-2. Do'stlaringizga yuboring
-3. Ular havola orqali botga kirishganda ball olasiz
+1. Do'stlaringizga guruh havolasini yuboring: https://t.me/testforviktorina
+2. Ular guruhga qo'shilgandan so'ng, sizning referal havolangizni yuboring
+3. Ular havola orqali botga kirishganda sizga ball qo'shiladi
 4. {self.min_referrals} ta do'st taklif qilganingizdan keyin viktorinaga qatnashishingiz mumkin
         """
     
@@ -70,8 +72,9 @@ Bu havolani do'stlaringiz bilan ulashing. Ular bu havola orqali botga kirishgand
 📋 **Viktorina qoidalari:**
 
 **🎯 Qatnashish shartlari:**
+• @testforviktorina guruhiga a'zo bo'lish shart
 • Kamida {self.min_referrals} ta do'stni taklif qilish kerak
-• Har bir do'st referral havola orqali botga kirishi shart
+• Har bir do'st avval guruhga qo'shilishi, so'ng referral havola orqali botga kirishi shart
 • Faqat haqiqiy foydalanuvchilar hisobga olinadi
 
 **🏆 Sovrinlar:**

@@ -8,6 +8,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from utils.referral_utils import ReferralUtils
 from utils.messages import Messages
+from config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ class UserHandlers:
         self.db = database
         self.referral_utils = ReferralUtils(database)
         self.messages = Messages()
+        self.config = Config()
     
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /start command"""
@@ -48,16 +50,28 @@ class UserHandlers:
         referrer = self.db.get_user_by_referral_code(referral_code)
         
         if referrer and referrer['user_id'] != referred_user_id:
-            success = self.db.add_referral(referrer['user_id'], referred_user_id)
-            if success:
-                # Notify referrer
-                try:
-                    await context.bot.send_message(
-                        chat_id=referrer['user_id'],
-                        text=self.messages.referral_success(update.effective_user.first_name)
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to notify referrer: {e}")
+            # Check if the referred user has joined the group
+            is_group_member = await self._check_group_membership(context, referred_user_id)
+            
+            if is_group_member:
+                success = self.db.add_referral(referrer['user_id'], referred_user_id)
+                if success:
+                    # Notify referrer
+                    try:
+                        await context.bot.send_message(
+                            chat_id=referrer['user_id'],
+                            text=self.messages.referral_success(update.effective_user.first_name)
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to notify referrer: {e}")
+            else:
+                # Send message to user to join the group first
+                group_link = f"https://t.me/{self.config.group_username}"
+                await update.message.reply_text(
+                    f"📢 Viktorinaga qatnashish uchun avval @{self.config.group_username} guruhiga qo'shiling!\n\n"
+                    f"🔗 Guruh havola: {group_link}\n\n"
+                    f"Guruhga qo'shilganingizdan so'ng, /start buyrug'ini qayta yuboring."
+                )
     
     async def _send_main_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Send main menu with inline keyboard"""
@@ -176,6 +190,24 @@ class UserHandlers:
             # Here you could implement logic to track group joins
             # and potentially award additional points or benefits
     
+    async def _check_group_membership(self, context: ContextTypes.DEFAULT_TYPE, user_id: int) -> bool:
+        """Check if user is a member of the target group"""
+        try:
+            # Try to get chat member info
+            chat_member = await context.bot.get_chat_member(
+                chat_id=f"@{self.config.group_username}", 
+                user_id=user_id
+            )
+            
+            # Check if user is a member (not left, kicked, or restricted)
+            if chat_member.status in ['member', 'administrator', 'creator']:
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error checking group membership for user {user_id}: {e}")
+            # If we can't check, assume they're not a member
+            return False
+
     async def help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /help command"""
         await update.message.reply_text(self.messages.help_message())

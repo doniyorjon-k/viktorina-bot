@@ -9,6 +9,7 @@ class Config:
         self.bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.bot_username = os.getenv("BOT_USERNAME", "QuizBot")
         self.group_id = os.getenv("GROUP_ID")  # The group where users should join
+        self.group_username = os.getenv("GROUP_USERNAME", "testforviktorina")  # Group username
         self.min_referrals = int(os.getenv("MIN_REFERRALS", "5"))
         self.admin_ids = self._parse_admin_ids()
         

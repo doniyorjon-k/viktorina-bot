@@ -16,15 +16,21 @@ Preferred communication style: Simple, everyday language.
 ✓ All handlers implemented for user interactions and admin functions
 ✓ Uzbek language interface fully implemented
 ✓ Referral system with unique codes working properly
+✓ Admin privileges granted to user ID 1385620971 (July 15, 2025)
+✓ Group membership checking implemented for @testforviktorina
+✓ Bot now requires users to join the group before referral links work
+✓ Updated messages to include group requirement information
 
 ## Current Status
 
 The bot is fully functional and ready for use. All major components are working:
 - User registration and referral tracking
-- Admin panel with participant management
+- Admin panel with participant management (admin: 1385620971)
 - Winner selection functionality
 - Uzbek language messages throughout
 - SQLite database properly initialized
+- Group membership verification for @testforviktorina
+- Referral system that requires group membership
 
 ## System Architecture
 
