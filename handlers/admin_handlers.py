@@ -215,3 +215,58 @@ class AdminHandlers:
             message += f"📅 {winner['selected_date']}\n\n"
         
         await update.message.reply_text(message, parse_mode='Markdown')
+    
+    async def add_manual_referral(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Manually add a referral (for group joins via referral links)"""
+        user_id = update.effective_user.id
+        
+        if not self._is_admin(user_id):
+            await update.message.reply_text("❌ Sizda admin huquqlari yo'q.")
+            return
+        
+        if len(context.args) < 2:
+            await update.message.reply_text(
+                "📝 Referal qo'shish uchun:\n"
+                "`/addref REFERRER_ID REFERRED_ID`\n\n"
+                "Masalan: `/addref 123456789 987654321`",
+                parse_mode='Markdown'
+            )
+            return
+        
+        try:
+            referrer_id = int(context.args[0])
+            referred_id = int(context.args[1])
+            
+            # Check if both users exist
+            referrer = self.db.get_user(referrer_id)
+            referred = self.db.get_user(referred_id)
+            
+            if not referrer:
+                await update.message.reply_text(f"❌ Referrer ID {referrer_id} topilmadi.")
+                return
+            
+            if not referred:
+                await update.message.reply_text(f"❌ Referred ID {referred_id} topilmadi.")
+                return
+            
+            # Add referral
+            success = self.db.add_referral(referrer_id, referred_id)
+            
+            if success:
+                # Get updated referrer info
+                updated_referrer = self.db.get_user(referrer_id)
+                await update.message.reply_text(
+                    f"✅ Referal qo'shildi!\n\n"
+                    f"Referrer: {referrer['first_name']} ({referrer_id})\n"
+                    f"Referred: {referred['first_name']} ({referred_id})\n"
+                    f"Yangi referal soni: {updated_referrer['referral_count']}\n"
+                    f"Qatnashish huquqi: {'✅ Bor' if updated_referrer['eligible'] else '❌ Yo`q'}"
+                )
+            else:
+                await update.message.reply_text("❌ Referal qo'shishda xatolik yuz berdi.")
+                
+        except ValueError:
+            await update.message.reply_text("❌ Noto'g'ri ID formati.")
+        except Exception as e:
+            logger.error(f"Error adding manual referral: {e}")
+            await update.message.reply_text("❌ Xatolik yuz berdi.")

@@ -38,6 +38,7 @@ class QuizBot:
         application.add_handler(CommandHandler("setwinner", self.admin_handlers.select_winner))
         application.add_handler(CommandHandler("setdate", self.admin_handlers.set_quiz_date))
         application.add_handler(CommandHandler("addadmin", self.admin_handlers.add_admin))
+        application.add_handler(CommandHandler("addref", self.admin_handlers.add_manual_referral))
         
         # Callback query handlers
         application.add_handler(CallbackQueryHandler(self.user_handlers.handle_callback))

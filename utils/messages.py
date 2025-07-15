@@ -5,7 +5,7 @@ Contains all user-facing messages in Uzbek
 
 class Messages:
     def __init__(self):
-        self.min_referrals = 5
+        self.min_referrals = 1
     
     def welcome_message(self) -> str:
         """Welcome message for new users"""
@@ -44,24 +44,24 @@ Viktorinaga qatnashish uchun yana {needed} ta do'st taklif qilishingiz kerak.
             """
     
     def invite_friends_message(self, referral_link: str) -> str:
-        """Invite friends message with referral link"""
+        """Invite friends message with group referral link"""
         return f"""
 👥 **Do'stlarni taklif qiling!**
 
 Viktorinaga qatnashish uchun kamida {self.min_referrals} ta do'stingizni taklif qiling.
 
-🔗 **Sizning shaxsiy havolangiz:**
+🔗 **Sizning guruh taklif havolangiz:**
 `{referral_link}`
 
-Bu havolani do'stlaringiz bilan ulashing. Ular bu havola orqali botga kirishganda, sizga ball qo'shiladi.
-
-⚠️ **Muhim:** Do'stlaringiz avval @testforviktorina guruhiga qo'shilishi kerak!
+Bu havolani do'stlaringiz bilan ulashing. Ular bu havola orqali @testforviktorina guruhiga qo'shilganda, sizga ball qo'shiladi.
 
 💡 **Qanday ishlaydi:**
-1. Do'stlaringizga guruh havolasini yuboring: https://t.me/testforviktorina
-2. Ular guruhga qo'shilgandan so'ng, sizning referal havolangizni yuboring
-3. Ular havola orqali botga kirishganda sizga ball qo'shiladi
+1. Yuqoridagi havolani nusxalang
+2. Do'stlaringizga yuboring  
+3. Ular havola orqali guruhga qo'shilganda sizga avtomatik ball qo'shiladi
 4. {self.min_referrals} ta do'st taklif qilganingizdan keyin viktorinaga qatnashishingiz mumkin
+
+⚠️ **Eslatma:** Faqat sizning havolangiz orqali qo'shilgan do'stlar hisoblanadi!
         """
     
     def rules_message(self, quiz_date: str = None) -> str:

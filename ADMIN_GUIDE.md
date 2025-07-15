@@ -32,6 +32,10 @@ Misol: `/setdate 25.12.2024`
 ### 5. `/addadmin USER_ID` - Yangi Admin Qo'shish
 Misol: `/addadmin 123456789`
 
+### 6. `/addref REFERRER_ID REFERRED_ID` - Qo'lda Referal Qo'shish
+Guruh orqali qo'shilgan foydalanuvchilar uchun qo'lda referal qo'shish
+Misol: `/addref 123456789 987654321`
+
 ## Viktorina Jarayoni
 
 ### 1. Tayyorgarlik
@@ -49,14 +53,14 @@ Misol: `/addadmin 123456789`
 
 ## Guruh Talablari
 
-**Muhim:** Foydalanuvchilar avval @testforviktorina guruhiga qo'shilishi kerak, so'ngina referal havolalar ishlaydi.
+**Muhim:** Endi foydalanuvchilar to'g'ridan-to'g'ri guruh referal havolasi oladi va orqali guruhga qo'shiladi.
 
-### Jarayon:
-1. Foydalanuvchi @testforviktorina guruhiga qo'shiladi
-2. Referal havola orqali botga kiradi
-3. Bot guruh a'zoligini tekshiradi
-4. Agar a'zo bo'lsa, referal hisoblanadi
-5. Agar a'zo bo'lmasa, guruhga qo'shilish talab qilinadi
+### Yangi Jarayon:
+1. Foydalanuvchi "Do'stlarni taklif qilish" tugmasini bosadi
+2. Bot guruh taklif havolasini beradi (bot havolasi emas!)
+3. Do'stlari ushbu havola orqali @testforviktorina guruhiga qo'shiladi
+4. Admin `/addref REFERRER_ID REFERRED_ID` orqali referalni qo'lda qo'shadi
+5. Minimum 1 ta referal yetarli (test uchun)
 
 ## Statistika Ko'rish
 

@@ -132,6 +132,9 @@ class UserHandlers:
             await query.edit_message_text("❌ Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.")
             return
         
+        # Create pending referral for tracking group joins
+        self.db.add_pending_referral(user['referral_code'], user_id)
+        
         referral_link = self.referral_utils.generate_referral_link(user['referral_code'])
         
         keyboard = [
@@ -178,17 +181,42 @@ class UserHandlers:
         await self._send_main_menu(update, context)
     
     async def handle_new_member(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle new members joining the group"""
-        # This handler can be used to track when users join the group
-        # via referral links, but it requires the bot to be in the group
-        # and have appropriate permissions
+        """Handle new members joining the group via referral links"""
+        
+        # Skip if bot itself joined
+        if update.message.new_chat_members and update.message.new_chat_members[0].id == context.bot.id:
+            return
         
         for member in update.message.new_chat_members:
             user_id = member.id
+            username = member.username or ""
+            first_name = member.first_name or ""
+            
             logger.info(f"New member joined group: {user_id}")
             
-            # Here you could implement logic to track group joins
-            # and potentially award additional points or benefits
+            # Generate referral code for new user
+            user_referral_code = self.referral_utils.generate_referral_code(user_id)
+            
+            # Add user to database if not exists
+            existing_user = self.db.get_user(user_id)
+            if not existing_user:
+                self.db.add_user(user_id, username, first_name, user_referral_code)
+            
+            # Note: For group referral tracking, we would need to check if this user
+            # joined via a specific referral link. This requires the group to be configured
+            # to pass referral parameters, which is typically done through the group's
+            # invite link settings or by having the bot in the group to track join events
+            # with referral context.
+            
+            # Welcome message to new group member
+            try:
+                await context.bot.send_message(
+                    chat_id=user_id,
+                    text="🎉 @testforviktorina guruhiga xush kelibsiz!\n\n"
+                         "Viktorinaga qatnashish uchun botni ishga tushiring: /start"
+                )
+            except Exception as e:
+                logger.error(f"Failed to send welcome message to new member: {e}")
     
     async def _check_group_membership(self, context: ContextTypes.DEFAULT_TYPE, user_id: int) -> bool:
         """Check if user is a member of the target group"""

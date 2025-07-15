@@ -20,6 +20,10 @@ Preferred communication style: Simple, everyday language.
 ✓ Group membership checking implemented for @testforviktorina
 ✓ Bot now requires users to join the group before referral links work
 ✓ Updated messages to include group requirement information
+✓ Changed referral system to provide group invite links instead of bot links
+✓ Minimum referrals reduced to 1 for testing purposes
+✓ Added manual referral command `/addref` for admin to track group joins
+✓ Created pending_referrals table for better tracking
 
 ## Current Status
 

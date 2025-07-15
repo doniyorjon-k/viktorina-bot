@@ -81,6 +81,17 @@ class Database:
                 )
             ''')
             
+            # Pending referrals table for tracking group joins via referral links
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS pending_referrals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    referral_code TEXT,
+                    referrer_id INTEGER,
+                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (referrer_id) REFERENCES users (user_id)
+                )
+            ''')
+            
             conn.commit()
             conn.close()
             logger.info("Database initialized successfully")
@@ -163,10 +174,10 @@ class Database:
                     WHERE user_id = ?
                 ''', (referrer_id,))
                 
-                # Check if user is now eligible (5+ referrals)
+                # Check if user is now eligible (1+ referrals)
                 cursor.execute('''
                     UPDATE users SET eligible = 1
-                    WHERE user_id = ? AND referral_count >= 5
+                    WHERE user_id = ? AND referral_count >= 1
                 ''', (referrer_id,))
                 
                 conn.commit()
@@ -358,3 +369,63 @@ class Database:
             except Exception as e:
                 logger.error(f"Error getting winners: {e}")
                 return []
+    
+    def add_pending_referral(self, referral_code: str, referrer_id: int) -> bool:
+        """Add pending referral for group joins"""
+        with self.lock:
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT OR REPLACE INTO pending_referrals (referral_code, referrer_id)
+                    VALUES (?, ?)
+                ''', (referral_code, referrer_id))
+                
+                conn.commit()
+                conn.close()
+                logger.info(f"Pending referral added: {referral_code} -> {referrer_id}")
+                return True
+            except Exception as e:
+                logger.error(f"Error adding pending referral: {e}")
+                return False
+    
+    def get_pending_referral(self, referral_code: str) -> Optional[dict]:
+        """Get pending referral by code"""
+        with self.lock:
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    SELECT referrer_id FROM pending_referrals 
+                    WHERE referral_code = ?
+                ''', (referral_code,))
+                
+                result = cursor.fetchone()
+                conn.close()
+                
+                if result:
+                    return {'referrer_id': result[0]}
+                return None
+            except Exception as e:
+                logger.error(f"Error getting pending referral: {e}")
+                return None
+    
+    def remove_pending_referral(self, referral_code: str) -> bool:
+        """Remove processed pending referral"""
+        with self.lock:
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    DELETE FROM pending_referrals WHERE referral_code = ?
+                ''', (referral_code,))
+                
+                conn.commit()
+                conn.close()
+                return True
+            except Exception as e:
+                logger.error(f"Error removing pending referral: {e}")
+                return False

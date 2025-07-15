@@ -31,9 +31,9 @@ class ReferralUtils:
         return f"ref_{referral_code}"
     
     def generate_referral_link(self, referral_code: str) -> str:
-        """Generate full referral link"""
-        base_url = self.config.referral_base_url
-        return f"{base_url}{referral_code}"
+        """Generate group invite referral link"""
+        # For testforviktorina group, create a group invite link with referral code
+        return f"https://t.me/{self.config.group_username}?start={referral_code}"
     
     def validate_referral_code(self, referral_code: str) -> bool:
         """Validate referral code format"""
