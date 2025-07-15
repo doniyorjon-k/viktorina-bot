@@ -204,11 +204,35 @@ class UserHandlers:
             if not existing_user:
                 self.db.add_user(user_id, username, first_name, user_referral_code)
             
-            # Note: For group referral tracking, we would need to check if this user
-            # joined via a specific referral link. This requires the group to be configured
-            # to pass referral parameters, which is typically done through the group's
-            # invite link settings or by having the bot in the group to track join events
-            # with referral context.
+            # Try to find if this user joined via a referral link
+            # Check pending referrals and match with timing
+            pending_referrals = self.db.get_all_pending_referrals()
+            
+            # If there are pending referrals, we can try to match them
+            # For now, we'll use the most recent pending referral as a heuristic
+            if pending_referrals:
+                most_recent = pending_referrals[0]  # Assuming ordered by newest first
+                referrer_id = most_recent['referrer_id']
+                referral_code = most_recent['referral_code']
+                
+                # Add the referral connection
+                success = self.db.add_referral(referrer_id, user_id)
+                if success:
+                    # Remove the processed pending referral
+                    self.db.remove_pending_referral(referral_code)
+                    
+                    # Notify the referrer
+                    try:
+                        referrer = self.db.get_user(referrer_id)
+                        await context.bot.send_message(
+                            chat_id=referrer_id,
+                            text=f"🎉 Tabriklaymiz!\n\n"
+                                 f"Sizning referalingiz orqali {first_name} guruhga qo'shildi!\n"
+                                 f"Sizning referal soningiz: {referrer['referral_count'] + 1}\n"
+                                 f"Viktorinaga qatnashish huquqi: {'✅ Bor' if referrer['referral_count'] >= 0 else '❌ Yo`q'}"
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to notify referrer: {e}")
             
             # Welcome message to new group member
             try:

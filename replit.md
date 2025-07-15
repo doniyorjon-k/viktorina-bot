@@ -24,6 +24,9 @@ Preferred communication style: Simple, everyday language.
 ✓ Minimum referrals reduced to 1 for testing purposes
 ✓ Added manual referral command `/addref` for admin to track group joins
 ✓ Created pending_referrals table for better tracking
+✓ Implemented automatic referral tracking when users join group
+✓ Fixed referral count calculations and eligibility updates
+✓ System now has 2 eligible participants ready for quiz
 
 ## Current Status
 
@@ -35,6 +38,8 @@ The bot is fully functional and ready for use. All major components are working:
 - SQLite database properly initialized
 - Group membership verification for @testforviktorina
 - Referral system that requires group membership
+- Automatic referral processing when users join group via referral links
+- 2 eligible participants ready for quiz (minimum 1 referral required)
 
 ## System Architecture
 

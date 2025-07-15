@@ -440,3 +440,32 @@ class Database:
             except Exception as e:
                 logger.error(f"Error removing pending referral: {e}")
                 return False
+    
+    def get_all_pending_referrals(self) -> List[dict]:
+        """Get all pending referrals ordered by newest first"""
+        with self.lock:
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    SELECT referral_code, referrer_id, created_date 
+                    FROM pending_referrals 
+                    ORDER BY created_date DESC
+                ''')
+                
+                results = cursor.fetchall()
+                conn.close()
+                
+                pending_referrals = []
+                for row in results:
+                    pending_referrals.append({
+                        'referral_code': row[0],
+                        'referrer_id': row[1],
+                        'created_date': row[2]
+                    })
+                
+                return pending_referrals
+            except Exception as e:
+                logger.error(f"Error getting pending referrals: {e}")
+                return []
