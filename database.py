@@ -377,8 +377,19 @@ class Database:
                 conn = sqlite3.connect(self.db_path)
                 cursor = conn.cursor()
                 
+                # Check if pending referral already exists
                 cursor.execute('''
-                    INSERT OR REPLACE INTO pending_referrals (referral_code, referrer_id)
+                    SELECT COUNT(*) FROM pending_referrals 
+                    WHERE referral_code = ? AND referrer_id = ?
+                ''', (referral_code, referrer_id))
+                
+                if cursor.fetchone()[0] > 0:
+                    conn.close()
+                    logger.info(f"Pending referral already exists: {referral_code}")
+                    return True
+                
+                cursor.execute('''
+                    INSERT INTO pending_referrals (referral_code, referrer_id)
                     VALUES (?, ?)
                 ''', (referral_code, referrer_id))
                 

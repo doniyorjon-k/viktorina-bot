@@ -132,8 +132,10 @@ class UserHandlers:
             await query.edit_message_text("❌ Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.")
             return
         
-        # Create pending referral for tracking group joins
-        self.db.add_pending_referral(user['referral_code'], user_id)
+        # Create pending referral for tracking group joins (only if not exists)
+        existing_pending = self.db.get_pending_referral(user['referral_code'])
+        if not existing_pending:
+            self.db.add_pending_referral(user['referral_code'], user_id)
         
         referral_link = self.referral_utils.generate_referral_link(user['referral_code'])
         
