@@ -35,7 +35,8 @@ Preferred communication style: Simple, everyday language.
 ✓ Bot token updated to new token (July 15, 2025)
 ✓ Bot successfully running with new authentication
 ✓ Added attractive invitation message for sharing with friends (July 15, 2025)
-✓ Users now get a ready-to-share message template with quiz details
+✓ Users now get a clean, attractive invitation message for direct sharing
+✓ Removed lengthy instructions, now shows beautiful ready-to-send invitation text
 
 ## Current Status
 

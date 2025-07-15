@@ -45,23 +45,8 @@ Viktorinaga qatnashish uchun yana {needed} ta do'st taklif qilishingiz kerak.
             """
     
     def invite_friends_message(self, referral_link: str) -> str:
-        """Invite friends message with group referral link"""
-        return f"""
-👥 **Do'stlarni taklif qiling!**
-
-Viktorinaga qatnashish uchun kamida {self.min_referrals} ta do'stingizni taklif qiling.
-
-🔗 **Sizning guruh taklif havolangiz:**
-`{referral_link}`
-
-Bu havolani do'stlaringiz bilan ulashing. Ular bu havola orqali @testforviktorina guruhiga qo'shilganda, sizga ball qo'shiladi.
-
-📱 **Do'stlaringizga yuborish uchun tayyor xabar:**
-
-*Quyidagi xabarni nusxalab do'stlaringizga yuboring:*
-
-```
-🎉 **Bepul viktorinaga taklif qilaman!**
+        """Beautiful invitation message to share with friends"""
+        return f"""🎉 **Bepul viktorinaga taklif qilaman!**
 
 Ajoyib sovrinlar va kutilmagan g'alabalar kutmoqda:
 🏆 1-o'rin: Blender
@@ -72,17 +57,7 @@ Siz ham ishtirok eting! Quyidagi havola orqali guruhga qo'shiling:
 
 Guruhga qo'shilgandan keyin @{self.bot_username} botiga yozing va viktorinaga qatnashish huquqini qo'lga kiriting! 
 
-⏰ Cheklanmagan vaqt yo'q - hoziroq ulanib qoling!
-```
-
-💡 **Qanday ishlaydi:**
-1. Yuqoridagi xabarni nusxalang
-2. Do'stlaringizga yuboring  
-3. Ular havola orqali guruhga qo'shilganda sizga avtomatik ball qo'shiladi
-4. {self.min_referrals} ta do'st taklif qilganingizdan keyin viktorinaga qatnashishingiz mumkin
-
-⚠️ **Eslatma:** Faqat sizning havolangiz orqali qo'shilgan do'stlar hisoblanadi!
-        """
+⏰ Cheklanmagan vaqt yo'q - hoziroq ulanib qoling!"""
     
     def rules_message(self, quiz_date: str = None) -> str:
         """Quiz rules message"""
