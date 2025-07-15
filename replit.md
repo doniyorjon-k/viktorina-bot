@@ -32,6 +32,8 @@ Preferred communication style: Simple, everyday language.
 ✓ Participants display now shows phone numbers for winner identification
 ✓ Contact sharing button added for easy phone number input
 ✓ Phone number validation and storage working properly
+✓ Bot token updated to new token (July 15, 2025)
+✓ Bot successfully running with new authentication
 
 ## Current Status
 
