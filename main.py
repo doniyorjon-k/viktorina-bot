@@ -45,6 +45,7 @@ class QuizBot:
         
         # Message handlers
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.user_handlers.handle_message))
+        application.add_handler(MessageHandler(filters.CONTACT, self.user_handlers.handle_contact))
         application.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, self.user_handlers.handle_new_member))
         
         # Error handler

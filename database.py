@@ -104,9 +104,9 @@ class Database:
                 cursor = conn.cursor()
                 
                 cursor.execute('''
-                    INSERT OR REPLACE INTO users (user_id, username, first_name, referral_code)
-                    VALUES (?, ?, ?, ?)
-                ''', (user_id, username, first_name, referral_code))
+                    INSERT OR REPLACE INTO users (user_id, username, first_name, referral_code, phone_number)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (user_id, username, first_name, referral_code, None))
                 
                 conn.commit()
                 conn.close()
@@ -124,7 +124,7 @@ class Database:
                 cursor = conn.cursor()
                 
                 cursor.execute('''
-                    SELECT user_id, username, first_name, referral_count, eligible, referral_code
+                    SELECT user_id, username, first_name, referral_count, eligible, referral_code, phone_number
                     FROM users WHERE user_id = ?
                 ''', (user_id,))
                 
@@ -138,7 +138,8 @@ class Database:
                         'first_name': result[2],
                         'referral_count': result[3],
                         'eligible': result[4],
-                        'referral_code': result[5]
+                        'referral_code': result[5],
+                        'phone_number': result[6]
                     }
                 return None
             except Exception as e:
@@ -224,7 +225,7 @@ class Database:
                 cursor = conn.cursor()
                 
                 cursor.execute('''
-                    SELECT user_id, username, first_name, referral_count
+                    SELECT user_id, username, first_name, referral_count, phone_number
                     FROM users WHERE eligible = 1
                     ORDER BY referral_count DESC
                 ''')
@@ -238,7 +239,8 @@ class Database:
                         'user_id': row[0],
                         'username': row[1],
                         'first_name': row[2],
-                        'referral_count': row[3]
+                        'referral_count': row[3],
+                        'phone_number': row[4]
                     })
                 
                 logger.info(f"Found {len(participants)} eligible participants")
@@ -264,6 +266,26 @@ class Database:
                 return True
             except Exception as e:
                 logger.error(f"Error updating user info: {e}")
+                return False
+    
+    def update_user_phone(self, user_id: int, phone_number: str) -> bool:
+        """Update user's phone number"""
+        with self.lock:
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    UPDATE users SET phone_number = ?
+                    WHERE user_id = ?
+                ''', (phone_number, user_id))
+                
+                conn.commit()
+                conn.close()
+                logger.info(f"Phone number updated for user {user_id}")
+                return True
+            except Exception as e:
+                logger.error(f"Error updating phone number: {e}")
                 return False
     
     def add_admin(self, admin_id: int, username: str) -> bool:

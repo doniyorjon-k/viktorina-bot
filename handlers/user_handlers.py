@@ -49,8 +49,14 @@ class UserHandlers:
         if referral_code:
             await self._process_referral(update, context, referral_code, user_id)
         
-        # Send welcome message with main menu
-        await self._send_main_menu(update, context)
+        # Check if user has phone number
+        current_user = self.db.get_user(user_id)
+        if current_user and not current_user.get('phone_number'):
+            # Request phone number
+            await self._request_phone_number(update, context)
+        else:
+            # Send welcome message with main menu
+            await self._send_main_menu(update, context)
     
     async def _process_referral(self, update: Update, context: ContextTypes.DEFAULT_TYPE, referral_code: str, referred_user_id: int):
         """Process referral link"""
@@ -111,6 +117,14 @@ class UserHandlers:
             await self._show_rules(query, context)
         elif data == "back_to_menu":
             await self._show_main_menu_callback(query, context)
+        elif data == "admin_participants":
+            await self._handle_admin_participants(query, context, user_id)
+        elif data == "admin_select_winner":
+            await self._handle_admin_select_winner(query, context, user_id)
+        elif data == "admin_set_date":
+            await self._handle_admin_set_date(query, context, user_id)
+        elif data == "admin_winners":
+            await self._handle_admin_winners(query, context, user_id)
     
     async def _show_my_results(self, query, context: ContextTypes.DEFAULT_TYPE, user_id: int):
         """Show user's referral results"""
@@ -186,8 +200,48 @@ class UserHandlers:
     
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle text messages"""
-        # For now, just redirect to main menu
-        await self._send_main_menu(update, context)
+        user_id = update.effective_user.id
+        message_text = update.message.text
+        
+        # Check if user is providing phone number
+        if message_text and (message_text.startswith('+') or message_text.isdigit()):
+            # Validate phone number format
+            if len(message_text) >= 9 and len(message_text) <= 15:
+                # Update user's phone number
+                success = self.db.update_user_phone(user_id, message_text)
+                if success:
+                    await update.message.reply_text(
+                        "✅ Telefon raqamingiz muvaffaqiyatli saqlandi!\n\n"
+                        "Endi viktorinada g'olib bo'lganingizda shu raqam orqali aniqlanasiz."
+                    )
+                    # Now send main menu
+                    await self._send_main_menu(update, context)
+                else:
+                    await update.message.reply_text("❌ Xatolik yuz berdi. Qayta urinib ko'ring.")
+            else:
+                await update.message.reply_text("❌ Noto'g'ri raqam formati. Qayta urinib ko'ring.")
+        else:
+            # For other messages, redirect to main menu
+            await self._send_main_menu(update, context)
+    
+    async def _request_phone_number(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Request phone number from user"""
+        from telegram import KeyboardButton, ReplyKeyboardMarkup
+        
+        # Create keyboard with phone number request button
+        keyboard = [
+            [KeyboardButton("📱 Raqamni yuborish", request_contact=True)]
+        ]
+        reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
+        
+        await update.message.reply_text(
+            "📱 **Telefon raqamingizni kiriting**\n\n"
+            "Viktorinada g'olib bo'lganingizda shu raqam orqali aniqlanasiz.\n\n"
+            "Raqamni quyidagi tugma orqali yuboring yoki qo'lda kiriting:\n"
+            "Masalan: +998901234567",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
     
     async def handle_new_member(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle new members joining the group via referral links"""
@@ -272,3 +326,128 @@ class UserHandlers:
     async def help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /help command"""
         await update.message.reply_text(self.messages.help_message())
+    
+    async def handle_contact(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle contact (phone number) sharing"""
+        if update.message.contact:
+            user_id = update.effective_user.id
+            phone_number = update.message.contact.phone_number
+            
+            # Update user's phone number
+            success = self.db.update_user_phone(user_id, phone_number)
+            if success:
+                from telegram import ReplyKeyboardRemove
+                await update.message.reply_text(
+                    "✅ Telefon raqamingiz muvaffaqiyatli saqlandi!\n\n"
+                    "Endi viktorinada g'olib bo'lganingizda shu raqam orqali aniqlanasiz.",
+                    reply_markup=ReplyKeyboardRemove()
+                )
+                # Now send main menu
+                await self._send_main_menu(update, context)
+            else:
+                await update.message.reply_text("❌ Xatolik yuz berdi. Qayta urinib ko'ring.")
+    
+    async def _handle_admin_participants(self, query, context: ContextTypes.DEFAULT_TYPE, user_id: int):
+        """Handle admin participants callback"""
+        if not self.db.is_admin(user_id):
+            await query.edit_message_text("❌ Sizda admin huquqlari yo'q.")
+            return
+        
+        participants = self.db.get_all_participants()
+        if not participants:
+            await query.edit_message_text("📋 Hozircha hech kim viktorinaga qatnasha olmaydi.")
+            return
+        
+        message = "👥 **Viktorina qatnashuvchilari:**\n\n"
+        for i, participant in enumerate(participants, 1):
+            username = f"@{participant['username']}" if participant['username'] else "Username yo'q"
+            phone = participant['phone_number'] if participant['phone_number'] else "Telefon yo'q"
+            message += f"{i}. {participant['first_name']} ({username})\n"
+            message += f"   📱 {phone}\n"
+            message += f"   🔗 Referallar: {participant['referral_count']}\n\n"
+        
+        message += f"**Jami qatnashuvchilar: {len(participants)}**"
+        await query.edit_message_text(message, parse_mode='Markdown')
+    
+    async def _handle_admin_select_winner(self, query, context: ContextTypes.DEFAULT_TYPE, user_id: int):
+        """Handle admin select winner callback"""
+        if not self.db.is_admin(user_id):
+            await query.edit_message_text("❌ Sizda admin huquqlari yo'q.")
+            return
+        
+        participants = self.db.get_all_participants()
+        if not participants:
+            await query.edit_message_text("❌ Qatnashuvchilar yo'q.")
+            return
+        
+        if len(participants) < 6:
+            await query.edit_message_text("❌ Minimum 6 qatnashuvchi bo'lishi kerak.")
+            return
+        
+        import random
+        # Select winners
+        winners = random.sample(participants, min(6, len(participants)))
+        
+        # First place - blender
+        first_place = winners[0]
+        self.db.add_winner(first_place['user_id'], "Blender (1-o'rin)")
+        
+        # Next 5 - vouchers
+        voucher_winners = winners[1:6]
+        for winner in voucher_winners:
+            self.db.add_winner(winner['user_id'], "100,000 so'm vaucher")
+        
+        # Format winner message
+        message = "🎉 **G'oliblar tanlandi!**\n\n"
+        message += f"🥇 **1-o'rin (Blender):**\n"
+        message += f"{first_place['first_name']}"
+        if first_place['username']:
+            message += f" (@{first_place['username']})"
+        if first_place['phone_number']:
+            message += f"\n📱 {first_place['phone_number']}"
+        message += f"\nReferallar: {first_place['referral_count']}\n\n"
+        
+        message += "🎁 **Vaucher g'oliblari (100,000 so'm):**\n"
+        for i, winner in enumerate(voucher_winners, 1):
+            message += f"{i}. {winner['first_name']}"
+            if winner['username']:
+                message += f" (@{winner['username']})"
+            if winner['phone_number']:
+                message += f" - 📱 {winner['phone_number']}"
+            message += f" - {winner['referral_count']} referal\n"
+        
+        await query.edit_message_text(message, parse_mode='Markdown')
+    
+    async def _handle_admin_set_date(self, query, context: ContextTypes.DEFAULT_TYPE, user_id: int):
+        """Handle admin set date callback"""
+        if not self.db.is_admin(user_id):
+            await query.edit_message_text("❌ Sizda admin huquqlari yo'q.")
+            return
+        
+        await query.edit_message_text(
+            "📅 **Viktorina sanasini belgilash**\n\n"
+            "Sanani belgilash uchun quyidagi buyruqni ishlating:\n"
+            "`/setdate DD.MM.YYYY`\n\n"
+            "Masalan: `/setdate 25.12.2024`",
+            parse_mode='Markdown'
+        )
+    
+    async def _handle_admin_winners(self, query, context: ContextTypes.DEFAULT_TYPE, user_id: int):
+        """Handle admin winners callback"""
+        if not self.db.is_admin(user_id):
+            await query.edit_message_text("❌ Sizda admin huquqlari yo'q.")
+            return
+        
+        winners = self.db.get_winners()
+        if not winners:
+            await query.edit_message_text("🏆 Hozircha g'oliblar yo'q.")
+            return
+        
+        message = "🏆 **G'oliblar ro'yxati:**\n\n"
+        for winner in winners:
+            username = f"@{winner['username']}" if winner['username'] else "Username yo'q"
+            message += f"👤 {winner['first_name']} ({username})\n"
+            message += f"🎁 {winner['prize_type']}\n"
+            message += f"📅 {winner['selected_date']}\n\n"
+        
+        await query.edit_message_text(message, parse_mode='Markdown')

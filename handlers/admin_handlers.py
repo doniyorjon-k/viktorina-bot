@@ -60,8 +60,10 @@ class AdminHandlers:
         message = "👥 **Viktorina qatnashuvchilari:**\n\n"
         for i, participant in enumerate(participants, 1):
             username = f"@{participant['username']}" if participant['username'] else "Username yo'q"
+            phone = participant['phone_number'] if participant['phone_number'] else "Telefon yo'q"
             message += f"{i}. {participant['first_name']} ({username})\n"
-            message += f"   Referallar: {participant['referral_count']}\n\n"
+            message += f"   📱 {phone}\n"
+            message += f"   🔗 Referallar: {participant['referral_count']}\n\n"
         
         message += f"**Jami qatnashuvchilar: {len(participants)}**"
         
