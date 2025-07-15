@@ -4,8 +4,9 @@ Contains all user-facing messages in Uzbek
 """
 
 class Messages:
-    def __init__(self):
+    def __init__(self, bot_username="QuizBot"):
         self.min_referrals = 1
+        self.bot_username = bot_username
     
     def welcome_message(self) -> str:
         """Welcome message for new users"""
@@ -55,8 +56,27 @@ Viktorinaga qatnashish uchun kamida {self.min_referrals} ta do'stingizni taklif 
 
 Bu havolani do'stlaringiz bilan ulashing. Ular bu havola orqali @testforviktorina guruhiga qo'shilganda, sizga ball qo'shiladi.
 
+📱 **Do'stlaringizga yuborish uchun tayyor xabar:**
+
+*Quyidagi xabarni nusxalab do'stlaringizga yuboring:*
+
+```
+🎉 **Bepul viktorinaga taklif qilaman!**
+
+Ajoyib sovrinlar va kutilmagan g'alabalar kutmoqda:
+🏆 1-o'rin: Blender
+💰 5 kishi: 100,000 so'm vaucher
+
+Siz ham ishtirok eting! Quyidagi havola orqali guruhga qo'shiling:
+{referral_link}
+
+Guruhga qo'shilgandan keyin @{self.bot_username} botiga yozing va viktorinaga qatnashish huquqini qo'lga kiriting! 
+
+⏰ Cheklanmagan vaqt yo'q - hoziroq ulanib qoling!
+```
+
 💡 **Qanday ishlaydi:**
-1. Yuqoridagi havolani nusxalang
+1. Yuqoridagi xabarni nusxalang
 2. Do'stlaringizga yuboring  
 3. Ular havola orqali guruhga qo'shilganda sizga avtomatik ball qo'shiladi
 4. {self.min_referrals} ta do'st taklif qilganingizdan keyin viktorinaga qatnashishingiz mumkin

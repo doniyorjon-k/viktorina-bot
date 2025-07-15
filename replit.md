@@ -34,6 +34,8 @@ Preferred communication style: Simple, everyday language.
 ✓ Phone number validation and storage working properly
 ✓ Bot token updated to new token (July 15, 2025)
 ✓ Bot successfully running with new authentication
+✓ Added attractive invitation message for sharing with friends (July 15, 2025)
+✓ Users now get a ready-to-share message template with quiz details
 
 ## Current Status
 

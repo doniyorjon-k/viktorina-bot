@@ -16,8 +16,8 @@ class UserHandlers:
     def __init__(self, database):
         self.db = database
         self.referral_utils = ReferralUtils(database)
-        self.messages = Messages()
         self.config = Config()
+        self.messages = Messages(self.config.bot_username)
     
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /start command"""
