@@ -68,3 +68,5 @@ Adminlar quyidagi buyruqlardan foydalanishi mumkin:
 - Barcha amallar loglangan
 
 Bot to'liq ishga tayyor va barcha funksiyalar sinovdan o'tgan!
+=======
+# viktorina-bot
