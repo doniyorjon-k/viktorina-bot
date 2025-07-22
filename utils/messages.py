@@ -84,7 +84,7 @@ Guruhga qo'shilgandan keyin @{self.bot_username} botiga yozing va viktorinaga qa
 {date_info}
 
 **📞 Aloqa:**
-Savollar uchun administratorlar bilan bog'laning.
+Savollar uchun administratorlar bilan bog'laning:
         """
     
     def referral_success(self, referred_user_name: str) -> str:
