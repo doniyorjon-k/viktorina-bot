@@ -89,7 +89,7 @@ class UserHandlers:
     async def _send_main_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Send main menu with inline keyboard"""
         keyboard = [
-            [InlineKeyboardButton("📊 Mening natijam", callback_data="my_results")],
+            [InlineKeyboardButton("📊 Mening natijalarim", callback_data="my_results")],
             [InlineKeyboardButton("👥 Do'stlarni taklif qilish", callback_data="invite_friends")],
             [InlineKeyboardButton("📋 Qoidalar", callback_data="rules")]
         ]
