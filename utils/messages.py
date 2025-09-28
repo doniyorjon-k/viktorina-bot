@@ -11,16 +11,11 @@ class Messages:
     def welcome_message(self) -> str:
         """Welcome message for new users"""
         return """
-🎉 **Maishiy texnika do'koni viktorinasiga xush kelibsiz!**
+Universal aka kanalining viktorina botiga xush kelibsiz!
 
-Bu bot orqali siz viktorinaga qatnashish huquqini qo'lga kirita olasiz va ajoyib sovrinlar yutib olishingiz mumkin!
-
-🏆 **Sovrinlar:**
-• 1-o'rin: Blender
-• 5 kishi: 100,000 so'm vaucher
+Kanalimiz rivojiga qo'shgan hissangiz hisobiga kanal nomidan o'ynaladigan yutuqli o'yinda qatnashish imkoniyatiga ega bo'lasiz.
 
 Quyidagi tugmalardan birini tanlang:
-        """
     
     def my_results_message(self, referral_count: int, eligible: bool) -> str:
         """User's referral results message"""
@@ -50,12 +45,10 @@ Viktorinaga qatnashish uchun yana {needed} ta do'st taklif qilishingiz kerak.
 
 Ajoyib sovrinlar va kutilmagan g'alabalar kutmoqda:
 🏆 1-o'rin: Blender
-💰 5 kishi: 100,000 so'm vaucher
+💰 5 kishi: 100,000 so'm pul yutug'i
 
 Siz ham ishtirok eting! Quyidagi havola orqali guruhga qo'shiling:
-{referral_link}
-
-Guruhga qo'shilgandan keyin @{self.bot_username} botiga yozing va viktorinaga qatnashish huquqini qo'lga kiriting! 
+{referral_link} 
 
 ⏰ Cheklanmagan vaqt yo'q - hoziroq ulanib qoling!"""
     
@@ -69,7 +62,7 @@ Guruhga qo'shilgandan keyin @{self.bot_username} botiga yozing va viktorinaga qa
 **🎯 Qatnashish shartlari:**
 • @testforviktorina guruhiga a'zo bo'lish shart
 • Kamida {self.min_referrals} ta do'stni taklif qilish kerak
-• Har bir do'st avval guruhga qo'shilishi, so'ng referral havola orqali botga kirishi shart
+• Har bir do'st avval referal link orqali guruhga qo'shilishi shart!
 • Faqat haqiqiy foydalanuvchilar hisobga olinadi
 
 **🏆 Sovrinlar:**
@@ -85,6 +78,7 @@ Guruhga qo'shilgandan keyin @{self.bot_username} botiga yozing va viktorinaga qa
 
 **📞 Aloqa:**
 Savollar uchun administratorlar bilan bog'laning:
+https://t.me/doniyorjon_k
         """
     
     def referral_success(self, referred_user_name: str) -> str:
